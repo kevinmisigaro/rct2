@@ -1,0 +1,384 @@
+<div style="margin-top: 70px;">
+  <div class="d-flex justify-content-center" style="min-height: 800px;">
+    <div class="card" style="width: 60rem; border: none">
+      <div class="card-header d-flex justify-content-end">
+        <button
+          class="btn btn-success"
+          *ngIf="en"
+          [disabled]="!allowGiveAll"
+          (click)="
+            openSendTednerReqMultipleModal(
+              sendTenderRequestSellerToBuyerMultiple
+            )
+          "
+        >
+          Send Request to All
+        </button>
+        <button
+          class="btn btn-success"
+          *ngIf="!en"
+          [disabled]="!allowGiveAll"
+          (click)="
+            openSendTednerReqMultipleModal(
+              sendTenderRequestSellerToBuyerMultiple
+            )
+          "
+        >
+          Tuma ombi kwa wote
+        </button>
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered">
+          <thead *ngIf="en">
+            <tr>
+              <th scope="col">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    (click)="checkAll()"
+                  />
+                  <label class="form-check-label"></label>
+                </div>
+              </th>
+              <th>
+                ID  
+              </th>
+              <th>Name</th>
+              <th>Country</th>
+              <th></th>
+            </tr>
+          </thead>
+          <thead *ngIf="!en">
+            <tr>
+              <th scope="col">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    (click)="checkAll()"
+                  />
+                  <label class="form-check-label"></label>
+                </div>
+              </th>
+              <th>
+                ID  
+              </th>
+              <th>Jina kamili</th>
+              <th>Nchi</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let buyer of buyers; let i = index">
+              <td>
+                <div class="form-check">
+                  <input
+                    class="form-check-input-box"
+                    type="checkbox"
+                    (change)="checkValue(buyer)"
+                    [checked]="buyer.selected"
+                  />
+                  <label class="form-check-label"></label>
+                </div>
+              </td>
+              <td>
+                {{ buyer.id }}
+              </td>
+              <td>
+                {{ buyer.name }}
+              </td>
+              <td>
+                {{ buyer.countryName }}
+              </td>
+              <td>
+                <button
+                  class="btn btn-outline-success"
+                  *ngIf="en"
+                  (click)="
+                    openSendTenderReqModal(
+                      buyer,
+                      sendTenderRequestSellerToBuyer
+                    )
+                  "
+                >
+                  Send Tender Request
+                </button>
+                <button
+                  class="btn btn-outline-success"
+                  *ngIf="!en"
+                  (click)="
+                    openSendTenderReqModal(
+                      buyer,
+                      sendTenderRequestSellerToBuyer
+                    )
+                  "
+                >
+                  Tuma ombi la Tenda
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal to send tender request to multiple buyer -->
+<ng-template #sendTenderRequestSellerToBuyerMultiple let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Tender Request</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Ombi la Tenda</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form
+      [formGroup]="sellerToBuyerRequestForm"
+      (ngSubmit)="sendRequestSellerToMultipleBuyer()"
+    >
+      <div class="form-row mb-2">
+        <div class="col">
+          <input
+            type="text"
+            placeholder="Quantity"
+            class="form-control"
+            formControlName="quantity"
+          />
+        </div>
+        <div class="col">
+          <input
+            type="text"
+            placeholder="Selling Price"
+            class="form-control"
+            formControlName="selling_price"
+          />
+        </div>
+      </div>
+
+      <div class="form-row mb-2">
+        <div class="col">
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (change)="checkIfGraded()" id="graded1" name="gradedOptions" checked value="1">
+            <label class="form-check-label" for="graded1">Is Graded</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (change)="checkIfGraded()" id="graded2" name="gradedOptions" value="2">
+            <label class="form-check-label" for="graded2">Is not Graded</label>
+          </div>
+
+        </div>
+        <div class="col">
+
+          <div *ngIf="!isTBSCertified">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" (change)="checkIfBatchCertified()" id="batch1" name="batchOptions" checked value="1">
+              <label class="form-check-label" for="batch1">Is Batch Certified</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" (change)="checkIfBatchCertified()" id="batch2" name="batchOptions" value="2">
+              <label class="form-check-label" for="batch2">Is not Batch Certified</label>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="form-row mb-3">
+        <div class="col">
+          <select class="form-control" formControlName="grade" *ngIf="isGraded">
+            <option value="" selected disabled>Grade</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+          </select>
+        </div>
+        <div class="col text-center">
+          <ng-container *ngIf="batchCertified">
+            <button class="btn btn-success" type="button" *ngIf="!isImageLoaded" (click)="fileInput.click()">
+              Add Batch Certification
+            </button>
+
+            <input style="display: none;" type="file" #fileInput (change)="addBatchCertificationImage($event)">
+
+            <ng-container *ngIf="isImageLoaded">
+              <button class="btn btn-info" type="button">
+               Batch Certification Image Added!
+              </button>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="form-row mb-3">
+       <div class="col">
+        <select formControlName="variety" class="form-control">
+          <option value="" selected disabled *ngIf="en">Varieties</option>
+          <option value="" selected disabled *ngIf="!en">Aina ya Mchele</option>
+          <option value="{{ variety.variety_name }}" *ngFor="let variety of sellerVarietyOptions">
+            {{ variety.variety_name }}
+          </option>
+        </select>
+       </div>
+       <div class="col">
+        <input
+        type="text"
+        placeholder="Pickup Location"
+        class="form-control"
+        formControlName="pickup_location"
+      />
+       </div>
+      </div>
+
+      <div class="form-group mb-2">
+        <textarea
+          class="form-control"
+          rows="5"
+          formControlName="extra_details"
+        ></textarea>
+      </div>
+
+      <div class="form-group mb-2 text-center">
+        <button class="btn btn-success" *ngIf="en">Send Multiple Request</button>
+        <button class="btn btn-success" *ngIf="!en">Tuma Maombi</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- modal to send tender request to buyer -->
+<ng-template #sendTenderRequestSellerToBuyer let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Tender Request</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Ombi la Tenda</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form
+      [formGroup]="sellerToBuyerRequestForm"
+      (ngSubmit)="sendRequestSellerToIndividualBuyer()"
+    >
+      <div class="form-row mb-2">
+        <div class="col">
+          <input
+            type="text"
+            placeholder="Quantity in kgs"
+            class="form-control"
+            formControlName="quantity"
+          />
+        </div>
+        <div class="col">
+          <input
+            type="text"
+            placeholder="Selling Price"
+            class="form-control"
+            formControlName="selling_price"
+          />
+        </div>
+      </div>
+
+      <div class="form-row mb-2">
+        <div class="col">
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (change)="checkIfGraded()" id="graded1" name="gradedOptions" checked value="1">
+            <label class="form-check-label" for="graded1">Is Graded</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" (change)="checkIfGraded()" id="graded2" name="gradedOptions" value="2">
+            <label class="form-check-label" for="graded2">Is not Graded</label>
+          </div>
+
+        </div>
+        <div class="col">
+
+          <div *ngIf="!isTBSCertified">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" (change)="checkIfBatchCertified()" id="batch1" name="batchOptions" checked value="1">
+              <label class="form-check-label" for="batch1">Is Batch Certified</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" (change)="checkIfBatchCertified()" id="batch2" name="batchOptions" value="2">
+              <label class="form-check-label" for="batch2">Is not Batch Certified</label>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="form-row mb-3">
+        <div class="col">
+          <select class="form-control" formControlName="grade" *ngIf="isGraded">
+            <option value="" selected disabled>Grade</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+          </select>
+        </div>
+        <div class="col text-center">
+          <ng-container *ngIf="batchCertified">
+            <button class="btn btn-success" type="button" *ngIf="!isImageLoaded" (click)="fileInputMultiple.click()">
+              Add Batch Certification
+            </button>
+
+            <input style="display: none;" type="file" #fileInputMultiple (change)="addBatchCertificationImage($event)">
+
+            <ng-container *ngIf="isImageLoaded">
+              <button class="btn btn-info" type="button">
+               Batch Certification Image Added!
+              </button>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="form-row mb-3">
+       <div class="col">
+        <select formControlName="variety" class="form-control">
+          <option value="" selected disabled  *ngIf="en">Varieties</option>
+          <option value="" selected disabled  *ngIf="!en">Aina ya Mchele</option>
+          <option value="{{ variety.variety_name }}" *ngFor="let variety of sellerVarietyOptions">
+            {{ variety.variety_name }}
+          </option>
+        </select>
+       </div>
+       <div class="col">
+        <input
+        type="text"
+        placeholder="Pickup Location"
+        class="form-control"
+        formControlName="pickup_location"
+      />
+       </div>
+      </div>
+
+      <div class="form-group mb-2">
+        <textarea
+          class="form-control"
+          rows="5"
+          formControlName="extra_details" placeholder="Extra details"
+        ></textarea>
+      </div>
+
+      <div class="form-group mb-2 text-center">
+        <button class="btn btn-success" *ngIf="en">Send Request</button>
+        <button class="btn btn-success" *ngIf="!en">Tuma Ombi</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

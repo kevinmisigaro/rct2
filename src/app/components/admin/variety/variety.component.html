@@ -1,0 +1,82 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Varieties</h1>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header d-flex justify-content-end">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="openVarietyModal(addVariety)"
+    >
+      Add Variety
+    </button>
+  </div>
+  <div class="card-body">
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Name</th>
+          <th>Cluster</th>
+          <th>Region</th>
+          <th>Added By</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="varieties">
+        <tr *ngFor="let variety of varieties; let i = index">
+          <td>
+            {{ i + 1 }}
+          </td>
+          <td>
+            {{ variety.variety_name }}
+          </td>
+          <td>
+            {{ variety.platform_name }}
+          </td>
+          <td>
+            {{ variety.platform_region }}
+          </td>
+          <td>
+            {{ variety.user_name }}
+          </td>
+          <td>
+            <a class="btn btn-warning btn-sm mr-2 text-white">
+              Edit
+            </a>
+            <a class="btn btn-sm btn-danger text-white">
+              Delete
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Variety Modal -->
+<ng-template #addVariety let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Variety</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="varietyForm" (ngSubmit)="addVarietyAction()">
+      <div class="form-group">
+        <label for="">Variety Name</label>
+        <input type="text" class="form-control" formControlName="variety" />
+      </div>
+      <div class="form-group d-flex justify-content-end">
+        <button class="btn btn-success" [disabled]="!varietyForm.valid" >Add Variety</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

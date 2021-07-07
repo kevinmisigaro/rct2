@@ -1,0 +1,86 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Market Price</h1>
+
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-flex justify-content-end">
+      <button class="btn btn-success" (click)="openAddPriceModal(addPriceModal)">
+          Add Price Rate
+      </button>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Vareity</th>
+                <th>Price (TZS)</th>
+                <th>Region</th>
+                <th>Effective Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let price of priceRate?.data; let i = index">
+                <td>
+                  {{ i + 1 }}
+                </td>
+                <td>
+                  {{ price.variety }}
+                </td>
+                <td>
+                  {{  price.price_rate }}
+                </td>
+                <td>
+                  {{ price.region }}
+                </td>
+                <td>
+                  {{ price.date }}
+                </td>
+                <td>
+                  <a class="btn btn-sm btn-info" [routerLink]="['/admin/price-history/', price.id]">
+                    Price History
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add price -->
+<ng-template #addPriceModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Price</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="addPriceForm" (ngSubmit)="addPriceAction()">
+      <div class="form-group">
+        <select class="form-control" formControlName="variety">
+          <option value="" selected disabled>Variety</option>
+          <option value="{{ variety.variety_name }}" *ngFor="let variety of varieties">{{ variety.variety_name }} from {{ variety.platform_name }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Price Rate" formControlName="priceRate">
+      </div>
+      <div class="form-group">
+        <select class="form-control" formControlName="region">
+          <option value="" selected disabled>Region</option>
+          <option value="{{ region.shortcode }}" *ngFor="let region of regions">{{ region.name }}</option>
+        </select>
+      </div>
+      <div class="form-group d-flex justify-content-end">
+        <button class="btn btn-success" [disabled]="!addPriceForm.valid">
+          Add Price Rate
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

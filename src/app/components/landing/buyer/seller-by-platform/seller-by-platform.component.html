@@ -1,0 +1,220 @@
+<div class="mt-5 vh-100 container">
+
+  <div class="d-flex justify-content-center">
+
+    <div style="margin-top: 50px;">
+
+      <button class="btn btn-outline-success" *ngIf="en" (click)="backButton()" style="width: 100px;">
+        < Back </button> <button class="btn btn-outline-success" *ngIf="!en" (click)="backButton()"
+          style="width: 150px;">
+          < Rudi Nyuma </button> <div class="card" style="width: 80rem; margin: 20px 0 20px 0;">
+            <div class="card-header d-flex justify-content-end">
+              <button class="btn btn-primary" *ngIf="en" [disabled]="!allowGiveAll"
+                (click)="openModalForMultipleSellers(tenderToMultipleSellersModal)">
+                Give Tender to All
+              </button>
+              <button class="btn btn-primary" *ngIf="!en" [disabled]="!allowGiveAll"
+                (click)="openModalForMultipleSellers(tenderToMultipleSellersModal)">
+                Toa Tenda kwa wote
+              </button>
+            </div>
+            <div class="card-body p-5">
+              <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+                <thead *ngIf="en">
+                  <tr>
+                    <th>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="check-all-input" type="checkbox" (click)="checkAll()">
+                      </div>
+                    </th>
+                    <th>Name</th>
+                    <th>Cluster Name</th>
+                    <th>Application Category</th>
+                    <th>Location</th>
+                    <th>TBS Certified</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <thead *ngIf="!en">
+                  <tr>
+                    <th>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="check-all-input" type="checkbox" (click)="checkAll()">
+                      </div>
+                    </th>
+                    <th>Jina Kamili</th>
+                    <th>Jina la Jukwaa</th>
+                    <th>Aina ya ombi</th>
+                    <th>Eneo</th>
+                    <th>Imethibitishwa na TBS</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let seller of sellers">
+                    <td>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" [checked]="seller.selected"
+                          (change)="addSellerViaCheckBox(seller)">
+                      </div>
+                    </td>
+                    <td>
+                      {{ seller.full_name }}
+                    </td>
+                    <td>
+                      {{ seller.platform_name }}
+                    </td>
+                    <td>
+                      {{ seller.application_type }}
+                    </td>
+                    <td>
+                      {{ seller.location }}
+                    </td>
+                    <td>
+                      {{ seller.is_tbs_certified }}
+                    </td>
+                    <td>
+                      <button class="btn btn-outline-success" *ngIf="en"
+                        (click)="giveTender(seller, tenderToSellersModal)">
+                        Give tender
+                      </button>
+                      <button class="btn btn-outline-success" *ngIf="!en"
+                        (click)="giveTender(seller, tenderToSellersModal)">
+                        Toa Tenda
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- Give tender to seller Modal -->
+<ng-template #tenderToSellersModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Give Tender</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Toa Tenda</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="giveTenderForm" (ngSubmit)="sendGiveTenderReq()">
+      <div class="form-row mb-3">
+        <div class="col">
+          <input type="number" placeholder="Quantity" class="form-control" formControlName="quantity">
+        </div>
+        <div class="col">
+          <select class="form-control" formControlName="grade">
+            <option value="" disabled selected *ngIf="en">
+              Grade
+            </option>
+            <option value="" disabled selected *ngIf="!en">
+              Daraja
+            </option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row mb-3">
+        <div class="col">
+          <input type="text" placeholder="Pickup location" *ngIf="en" class="form-control" formControlName="location">
+          <input type="text" placeholder="Eneo ya kuchukua mzigo" *ngIf="!en" class="form-control" formControlName="location">
+        </div>
+        <div class="col">
+          <select formControlName="variety" class="form-control">
+            <option value="" selected disabled *ngIf="en">Varieties</option>
+            <option value="" selected disabled *ngIf="!en">Aina ya mchele</option>
+            <option value="{{ variety.variety_name }}" *ngFor="let variety of sellerVarietyOptions">
+              {{ variety.variety_name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group mt-3 text-center">
+        <button class="btn btn-success" type="submit" *ngIf="en">
+          Send Tender Request
+        </button>
+        <button class="btn btn-success" type="submit" *ngIf="en">
+            Tuma ombi la Tenda
+          </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<!-- Give tender to multiple sellers Modal -->
+<ng-template #tenderToMultipleSellersModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Give Tender</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Toa tenda</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="giveTenderForm" (ngSubmit)="giveTenderRequestsToMultiple()">
+      <div class="form-row mb-3">
+        <div class="col">
+          <input type="number" placeholder="Quantity" class="form-control" formControlName="quantity">
+        </div>
+        <div class="col">
+          <select class="form-control" formControlName="grade">
+            <option value="" disabled selected *ngIf="en">
+              Grade
+            </option>
+            <option value="" disabled selected *ngIf="!en">
+              Daraja
+            </option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row mb-3">
+        <div class="col">
+          <input type="text" placeholder="Pickup location" class="form-control" formControlName="location">
+        </div>
+        <div class="col">
+          <select formControlName="variety" class="form-control">
+            <option value="" selected disabled *ngIf="en">Varieties</option>
+            <option value="" selected disabled *ngIf="!en">Aina ya mchele</option>
+            <option value="{{ variety.variety_name }}" *ngFor="let variety of sellerVarietyOptions">
+              {{ variety.variety_name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row mb-3 d-flex justify-content-center">
+        <p *ngIf="en">
+          {{ numberOfSellersChosen.length }} were chosen
+        </p>
+        <p *ngIf="en">
+            {{ numberOfSellersChosen.length }} wamechaguliwa
+          </p>
+      </div>
+
+      <div class="form-group mt-3 text-center">
+        <button class="btn btn-success" type="submit" *ngIf="en">
+          Send Tender Request to Multiple Buyers
+        </button>
+        <button class="btn btn-success" type="submit" *ngIf="!en">
+            Tuma maombi ya tenda kwa wanunuaji tofauti
+          </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

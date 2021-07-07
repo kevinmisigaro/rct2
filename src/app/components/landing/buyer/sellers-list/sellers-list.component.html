@@ -1,0 +1,157 @@
+<div class="mt-5 vh-100">
+
+   <div class="d-flex justify-content-center">
+
+    <div class="card" style="width: 80rem; margin: 50px 0 20px 0;">
+        <div class="card-header d-flex justify-content-end">
+            <button class="btn btn-primary" [disabled]="!allowGiveAll" (click)="openModalForMultipleSellers(tenderToMultipleSellersModal)">
+                Give Tender to All
+            </button>
+        </div>
+        <div class="card-body p-5">
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" (click)="checkAll()">
+                          </div>
+                    </th>
+                    <th>Name</th>
+                    <th>Platform Name</th>
+                    <th>Application Category</th>
+                    <th>Location</th>
+                    <th>TBS Certified</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let seller of sellers">
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" [checked]="seller.selected" (change)="addSellerViaCheckBox(seller)">
+                              </div>
+                        </td>
+                        <td>
+                            {{ seller.full_name }}
+                        </td>
+                        <td>
+                            {{ seller.platform_name }}
+                        </td>
+                        <td>
+                            {{ seller.application_type }}
+                        </td>
+                        <td>
+                            {{ seller.location }}
+                        </td>
+                        <td>
+                            {{ seller.is_tbs_certified }}
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-success" (click)="giveTender(seller, tenderToSellersModal)">
+                                Give tender
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+
+   </div>
+
+</div>
+
+
+<!-- Give tender to seller Modal -->
+<ng-template #tenderToSellersModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Give Tender</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="giveTenderForm" (ngSubmit)="sendGiveTenderReq()"> 
+            <div class="form-row mb-3">
+                <div class="col">
+                    <input type="number" placeholder="Quantity" class="form-control" formControlName="quantity">
+                </div>
+                <div class="col">
+                    <select class="form-control" formControlName="grade">
+                        <option value="" disabled selected>
+                            Grade
+                        </option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col">
+                    <input type="text" placeholder="Pickup location" class="form-control" formControlName="location">
+                </div>
+                <div class="col">
+                    <input type="text" placeholder="Variety" class="form-control" formControlName="variety">
+                </div>
+            </div>
+
+            <div class="form-group mt-3 text-center">
+                <button class="btn btn-success" type="submit">
+                    Send Tender Request
+                </button>
+            </div>
+        </form>
+    </div>
+  </ng-template>
+
+
+  <!-- Give tender to multiple sellers Modal -->
+<ng-template #tenderToMultipleSellersModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Give Tender</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="giveTenderForm" (ngSubmit)="giveTenderRequestsToMultiple()"> 
+            <div class="form-row mb-3">
+                <div class="col">
+                    <input type="number" placeholder="Quantity" class="form-control" formControlName="quantity">
+                </div>
+                <div class="col">
+                    <select class="form-control" formControlName="grade">
+                        <option value="" disabled selected>
+                            Grade
+                        </option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col">
+                    <input type="text" placeholder="Pickup location" class="form-control" formControlName="location">
+                </div>
+                <div class="col">
+                    <input type="text" placeholder="Variety" class="form-control" formControlName="variety">
+                </div>
+            </div>
+
+            <div class="form-row mb-3 d-flex justify-content-center">
+                <p>
+                    {{ numberOfSellersChosen.length }} were chosen
+                </p>
+            </div>
+
+            <div class="form-group mt-3 text-center">
+                <button class="btn btn-success" type="submit">
+                    Send Tender Request to Multiple Buyers
+                </button>
+            </div>
+        </form>
+    </div>
+  </ng-template>

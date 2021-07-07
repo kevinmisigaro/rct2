@@ -1,0 +1,47 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Your Profile</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header">
+       Name: {{ user?.user.name }}
+    </div>
+    <div class="card-body">
+        <p>
+            Phone Number: {{ user?.user.dial_code }}{{ user?.user.phone_number }}
+        </p>
+        <br>
+        <h4>
+            Your roles
+        </h4>
+        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Role</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let role of user?.roles; let i = index">
+                <td>
+                    {{ i + 1 }}
+                </td>
+                <td>
+                    {{ role.role }}
+                </td>
+                <td>
+                    <span class="badge badge-sm badge-success" *ngIf="role.active == 1; else notActiveBlk">
+                        Active
+                    </span>
+
+                    <ng-template #notActiveBlk>
+                        <span class="badge badge-sm badge-danger">
+                            Not Active
+                        </span>
+                    </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+</div>

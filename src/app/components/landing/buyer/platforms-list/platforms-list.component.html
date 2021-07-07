@@ -1,0 +1,47 @@
+<div class="container min-vh-100">
+  <div style="margin-top: 70px">
+    <button class="btn btn-outline-success" style="width: 100px" (click)="backButton()" *ngIf="en">
+      < Back </button> 
+      <button class="btn btn-outline-success" style="width: 150px" (click)="backButton()" *ngIf="!en">
+        < Rudi Nyuma 
+      </button> 
+      </div> <br />
+
+        <div class="mb-4">
+          <h1 *ngIf="en">Clusters</h1>
+          <h1 *ngIf="!en">Majukwa</h1>
+        </div>
+
+        <div class="row">
+          <div class="col-md-3" *ngFor="let platform of platforms">
+            <!-- platform-->
+            <div class="card mb-4" style="width: 100%">
+              <ng-container *ngIf="platform.image_path == ''; else platformImageBlk">
+                <img src="assets/img/MCHELE/1.jpg" class="card-img-top" style="max-height: 150px" />
+              </ng-container>
+
+              <ng-template #platformImageBlk>
+                <img src="https://rctapp.co.tz/rctimages/rct-upload-encoded/{{
+              platform.image_path
+            }}" class="card-img-top" style="max-height: 150px" />
+              </ng-template>
+
+              <div class="card-body text-center">
+                <h5>
+                  {{ platform.platform_name }}
+                </h5>
+                <div style="margin-top: 20px">
+                  <p *ngIf="en">{{ platform.number_of_members }} members</p>
+                  <p *ngIf="!en">Wanachama {{ platform.number_of_members }}</p>
+                  <a *ngIf="en" class="btn btn-outline-dark btn-sm" [routerLink]="['/home/sellers/by-platform/', platform.id]">
+                    View Sellers
+                  </a>
+                  <a *ngIf="!en" class="btn btn-outline-dark btn-sm" [routerLink]="['/home/sellers/by-platform/', platform.id]">
+                    Angalia Wauzaji
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>

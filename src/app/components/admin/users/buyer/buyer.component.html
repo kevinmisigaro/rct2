@@ -1,0 +1,51 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">
+    Buyers
+</h1>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header">
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+
+      <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Active Status</th>
+            <th>Country</th>
+            <th>Phone Number</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let buyer of buyers">
+            <td>
+                {{ buyer?.name }}
+            </td>
+            <td>
+                <span class="badge badge-pill badge-success" *ngIf="buyer.active_status; else notActiveBlock">Active</span>
+                <ng-template #notActiveBlock>
+                    <span class="badge badge-pill badge-danger">Inactive</span>
+                </ng-template>
+            </td>
+            <td>
+                {{ buyer?.countryName }}
+            </td>
+            <td>
+                0{{ buyer?.phone_number }}
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" (click)="deleteBuyer(buyer.id)">
+                Delete
+              </button>
+            </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

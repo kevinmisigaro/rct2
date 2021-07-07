@@ -1,0 +1,66 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">
+    Tender Requests
+</h1>
+
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Quantity</th>
+                <th>Grade</th>
+                <th>Variety</th>
+                <th>Selling Price</th>
+                <th>Certification</th>
+                <th>Pickup Location</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="tendersRequested">
+              <tr *ngFor="let tender of tendersRequested; let i = index">
+                <td>
+                    {{ i + 1 }}
+                </td>
+                <td>
+                    {{ tender.quantity }}
+                </td>
+                <td>
+                    {{ tender.grade }}
+                </td>
+                <td>
+                    {{ tender.variety }}
+                </td>
+                <td>
+                    {{ tender.selling_price }}
+                </td>
+                <td>
+                    <span class="badge badge-success" *ngIf="tender.is_batch_certified; else notCertified">Certified</span>
+                    <ng-template #notCertified>
+                        <span class="badge badge-danger">Not certified</span>
+                    </ng-template>
+                </td>
+                <td>
+                    {{ tender.pickup_location }}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary mr-1">
+                        View
+                    </button>
+                    <button class="btn btn-sm btn-warning mr-1">
+                        Edit
+                    </button>
+                    <button class="btn-sm btn btn-danger">
+                        Delete
+                    </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+  </div>
+</div>

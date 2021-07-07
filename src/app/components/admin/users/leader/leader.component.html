@@ -1,0 +1,39 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Leaders</h1>
+
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header">
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Cluster</th>
+                <th>Region</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let leader of leaders.data">
+                    <td>
+                        {{ leader.name }}
+                    </td>
+                    <td>
+                        {{ leader.phone_number }}
+                    </td>
+                    <td>
+                        {{ leader.platform_name }}
+                    </td>
+                    <td>
+                        {{ leader.platform_region }}
+                    </td>
+                </tr>
+            </tbody>
+          </table>
+    </div>
+  </div>
+</div>

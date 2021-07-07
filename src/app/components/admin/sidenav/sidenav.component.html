@@ -1,0 +1,112 @@
+<!-- Sidebar - Brand -->
+<a class="sidebar-brand d-flex align-items-center justify-content-center">
+
+  <div class="sidebar-brand-text mx-3" *ngIf="role == 'admin'; else leaderBlock">
+    RCT Admin
+  </div>
+
+  <ng-template #leaderBlock>
+    <div class="sidebar-brand-text mx-3">
+      {{ platform }}
+    </div>
+  </ng-template>
+
+</a>
+
+<!-- Divider -->
+<hr class="sidebar-divider my-0">
+
+<!-- Nav Item - Dashboard -->
+<li class="nav-item">
+  <a class="nav-link" routerLink="/admin/home">
+    <span>Dashboard</span></a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<li class="nav-item" *ngIf="role == 'leader'">
+  <a class="nav-link" routerLink="/admin/variety">
+    <span>Varieties</span></a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link" routerLink="/admin/market-price">
+    <span>Market Price</span></a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
+    aria-controls="collapseTwo">
+    <span>System Users</span>
+  </a>
+  <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+    <div class="bg-white py-2 collapse-inner rounded">
+      <ng-container *ngIf="role == 'admin'">
+        <!-- <a class="collapse-item" routerLink="/admin/admins">Administrators</a> -->
+        <a class="collapse-item" routerLink="/admin/leader">Cluster Leaders</a>
+      </ng-container>
+      <a class="collapse-item" routerLink="/admin/seller">Rice Sellers</a>
+      <a class="collapse-item" routerLink="/admin/buyer" *ngIf="role == 'admin'">Rice Buyers</a>
+    </div>
+  </div>
+</li>
+
+<ng-container *ngIf="role == 'admin'">
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/admin/platforms">
+
+      <span>Clusters</span></a>
+  </li>
+</ng-container>
+
+
+<!-- <li class="nav-item">
+  <a class="nav-link" routerLink="/admin/tenders/requests">
+    <span>Tender Requests</span></a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link" routerLink="/admin/tenders/given">
+    <span>Tender Given</span></a>
+</li> -->
+
+<!-- <ng-container *ngIf="role == 'admin'">
+  <li class="nav-item">
+    <a class="nav-link">
+
+      <span>User Feedback</span></a>
+  </li>
+</ng-container> -->
+
+<!-- <ng-container *ngIf="role == 'admin'">
+  <li class="nav-item">
+    <a class="nav-link">
+
+      <span>User Account</span></a>
+  </li>
+</ng-container> -->
+
+<!-- <ng-container *ngIf="role == 'admin'">
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/admin/banners">
+
+      <span>Marketing Banners</span></a>
+  </li>
+</ng-container> -->
+
+<ng-container *ngIf="role == 'admin'">
+  <li class="nav-item">
+    <a class="nav-link"  routerLink="/admin/logs">
+
+      <span>System Logs</span></a>
+  </li>
+</ng-container>
+
+<!-- Divider -->
+<hr class="sidebar-divider d-none d-md-block">
+
+<!-- Sidebar Toggler (Sidebar) -->
+<!-- <div class="text-center d-none d-md-inline">
+  <button class="rounded-circle border-0" id="sidebarToggle"></button>
+</div> -->

@@ -1,0 +1,329 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Sellers</h1>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header d-flex justify-content-end">
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addSellerModal">
+      Add Seller
+    </button>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Cluster</th>
+            <th>Cluster Leader</th>
+            <th>Location</th>
+            <th>Tags</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="sellers">
+          <tr *ngFor="let seller of sellers">
+            <td>
+              {{ seller.full_name }}
+            </td>
+            <td>
+              {{ seller.phone_number }}
+            </td>
+            <td>
+              {{ seller.platform_name }}
+            </td>
+            <td>
+              {{ seller.platform_leader }}
+            </td>
+            <td>
+              {{ seller.location }} <br> {{ seller.district }} <br> Tanzania
+            </td>
+            <td>
+              <div *ngIf="seller.is_tbs_certified !== '' ; else notTBSBlock">
+                <span class="badge badge-success text-white">
+                  <small>TBS CERTIFIED</small>
+                </span>
+              </div>
+              <ng-template #notTBSBlock>
+                <span class="badge badge-warning text-white">
+                  <small>NOT TBS CERTIFIED</small>
+                </span>
+              </ng-template>
+            </td>
+            <td>
+              <a class="mr-1 btn btn-primary btn-sm text-white" (click)="openViewSellerModal(seller, viewSeller)">
+                View
+              </a>
+              <a class="mr-1 btn btn-warning btn-sm text-white">
+                Edit
+              </a>
+              <a class="btn btn-danger btn-sm text-white" (click)="openDeleteSellerModal(deleteSellerModal, seller)">
+                Delete
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- view seller modal -->
+<ng-template #viewSeller let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Seller details</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row mb-2">
+      <div class="col">
+        <label for="">Name</label>
+        <input type="text" class="form-control" value="{{ seller.full_name  }}" disabled>
+      </div>
+      <div class="col">
+        <label for="">Phone Number</label>
+        <input type="text" class="form-control" value="{{ seller.phone_number }}" disabled>
+      </div>
+    </div>
+    <div class="row mb-2">
+      <div class="col">
+        <label for="">Location</label>
+        <input type="text" class="form-control" value="{{ seller.location }}" disabled>
+      </div>
+      <div class="col">
+        <label for="">Category</label>
+        <input type="text" class="form-control" value="{{ seller.category }}" disabled>
+      </div>
+    </div>
+    <div class="row mb-2">
+      <div class="col">
+        <label for="">Platform</label>
+        <input type="text" class="form-control" value="{{ seller.platform_name }}" disabled>
+      </div>
+      <div class="col">
+        <label for="">Application Type</label>
+        <input type="text" class="form-control" value="{{ seller.application_type }}" disabled>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Add Seller Modal -->
+<div class="modal fade" id="addSellerModal" tabindex="-1" aria-labelledby="addSellerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addSellerModalLabel">Add Seller</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="sellerModalClose">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addSellerForm" (ngSubmit)="addSeller()">
+
+          <div class="form-group mb-3">
+           
+            <ng-container *ngIf="!isLeader; else leaderPlatform">
+              <ng-select [items]="platforms" 
+                bindLabel="platform_name" 
+                bindValue="id"
+                [(ngModel)]="selectedPlatform"
+                formControlName="platformID"
+                placeholder="Select Cluster" >
+              </ng-select>
+            </ng-container>
+
+            <ng-template #leaderPlatform>
+              <select class="form-control" formControlName="platformID">
+                <option value="platformId" [selected]="true">{{ platformName }}</option>
+              </select>
+            </ng-template>
+            
+          </div>
+
+          <div class="form-row mb-3">
+            <div class="col">
+              <input type="text" class="form-control" placeholder="First Name" formControlName="firstName" autocomplete="off">
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" placeholder="Last Name" formControlName="lastName" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="form-row mb-3">
+
+            <div class="col">
+              <label class="sr-only" for="inlineFormInputGroup">Phone Number</label>
+              <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">+255</div>
+                </div>
+                <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Phone Number" formControlName="phone" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="form-group"> 
+                <input type="text" class="form-control" placeholder="Address" formControlName="address" autocomplete="off">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-row mb-3">
+            <div class="col">
+                <select class="form-control" formControlName="experience">
+                  <option value="" disabled selected>Experience</option>
+                  <option value="0 - 5 years">0 - 5 years</option>
+                  <option value="6 - 10 years">6 - 10 years</option>
+                  <option value="11 -  20 years">11 -  20 years</option>
+                  <option value="21+ years">21+ years</option>
+                </select>
+            </div>
+            <div class="col">
+              <select class="form-control" formControlName="grade" formControlName="category">
+                <option value="" disabled selected>Enter Scale Status</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row mb-3">
+            <div class="col">
+              <input type="text" placeholder="Website" class="form-control" formControlName="website" autocomplete="off">
+            </div>
+            <div class="col">
+              <select name="" id="" class="form-control" formControlName="application_type">
+                <option value="" disabled selected>Enter Applicant Category</option>
+                <option value="individual">Individual</option>
+                <option value="company">Company</option>
+                <option value="association">Association</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row row mb-3">
+              <div class="col">
+                <ng-select [items]="cards"
+                bindLabel="name" 
+                bindValue="name" 
+                [(ngModel)]="selectedCard"
+                formControlName="cardName"
+                placeholder="Select Type of Card" >
+            </ng-select>
+              </div>
+              <div class="col text-center">
+                <button class="btn btn-info" (click)="cardImageInput.click()" type="button">
+                  <span *ngIf="!cardImageAdded">
+                    Add Card Image
+                  </span>
+                  <span *ngIf="cardImageAdded">
+                    Card Image Added
+                  </span>
+                </button>
+                <input type="file" hidden (change)="onUploadCard($event)" #cardImageInput>
+              </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <div class="form-check">
+              <input class="form-check-input" (change)="changeCertificationInput()" type="radio" name="flexRadioDefault" id="yesTBS" checked>
+              <label class="form-check-label" for="flexRadioDefault1">
+                Has TBS Certification
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" (change)="changeCertificationInput()" type="radio" name="flexRadioDefault" id="noTBS">
+              <label class="form-check-label" for="flexRadioDefault2">
+                Does not have TBS Certification
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row row mb-3" *ngIf="tbsCertification">
+            <div class="col">
+              <input type="text" class="form-control" id="tbsInput"  placeholder="Enter TBS Certification Number" formControlName="tbs_number" autocomplete="off">
+            </div>
+            <div class="col text-center">
+              <button class="btn btn-primary" (click)="addTBSImage()" type="button">
+                <span *ngIf="!imageAdded">
+                  Add TBS Certification Image
+                </span>
+                <span *ngIf="imageAdded">
+                  TBS Certification Image Added!
+                </span>
+              </button>
+              <input type="file" id="tbsCertInput" hidden class="form-control" (change)="onUploadChange($event)"/>
+            </div>
+          </div>
+
+          <!-- <div class="form-group row mb-3" *ngIf="!tbsCertification">
+            <div class="col">
+              <input type="text" class="form-control" id="certificationInput" placeholder="Enter Certification number" formControlName="certification_number" autocomplete="off">
+            </div>
+            <div class="col text-center" >
+              <button class="btn btn-primary" (click)="addCertImage()" type="button">
+                <span *ngIf="!imageAdded">
+                  Add Certification Image
+                </span>
+                <span *ngIf="imageAdded">
+                  Certification Image Added!
+                </span>
+              </button>
+              <input type="file" hidden id="certInput" class="form-control" (change)="onUploadChange($event)"/>
+            </div>
+          </div> -->
+
+          <div class="form-group">
+            <div class="text-center">
+              <button type="submit" class="btn btn-success">
+                Add Seller
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- edit single seller -->
+<ng-template #editSellerModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title"></h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+
+    </form>
+  </div>
+</ng-template>
+
+<!-- delete seller -->
+<ng-template #deleteSellerModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Delete Seller</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <p>
+      Are you sure you want to delete {{ seller.full_name }} from the system?
+    </p>
+    <button class="btn btn-danger" (click)="deleteSellerAction(seller.id)">
+      Delete Seller
+    </button>
+  </div>
+</ng-template>

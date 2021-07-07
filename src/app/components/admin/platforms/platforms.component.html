@@ -1,0 +1,217 @@
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Clusters</h1>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-flex justify-content-end">
+    <button
+      class="btn btn-primary"
+      data-toggle="modal"
+      data-target="#addPlatformModal"
+    >
+      Add Cluster
+    </button>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Country</th>
+            <th>Region</th>
+            <th>Contacts</th>
+            <th>Cluster Leader</th>
+            <th>Members</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="platforms">
+          <tr *ngFor="let platform of platforms.data.platform">
+            <td>
+              {{ platform.platform_name }}
+            </td>
+            <td>
+              {{ platform.country }}
+            </td>
+            <td>
+              {{ platform.platform_region }}
+            </td>
+            <td>0{{ platform.phone_number }}</td>
+            <td>
+              {{ platform.leader_name }}
+            </td>
+            <td>
+              {{ platform.number_of_members }}
+            </td>
+            <td >
+                <button class="btn btn-primary btn-sm mr-1 text-white" (click)="openViewPlatformModal(platform, openPlatform)">
+                  View
+                </button>
+                <button class="btn btn-warning btn-sm mr-1 text-white">
+                  Edit
+                </button>
+                <button class="btn btn-danger btn-sm text-white" (click)="openDeletePlatformModal(deletePlatformModal, platform)">
+                  Delete
+                </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- view platform -->
+<ng-template #openPlatform let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Cluster Details</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row mb-3">
+      <div class="col">
+        <label for="">Cluster Name</label>
+        <input type="text" class="form-control" value="{{platform.platform_name}}" disabled>
+      </div>
+      <div class="col">
+        <label for="">Status</label>
+        <input type="text" class="form-control" value="Active" disabled *ngIf="platform.active == 1; else inActive">
+        <ng-template #inActive>
+          <input type="text" class="form-control" value="Inactive" disabled>
+        </ng-template>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="">Members</label>
+        <input type="text" class="form-control" value="{{platform.number_of_members}}" disabled>
+      </div>
+      <div class="col">
+        <label for="">Region</label>
+        <input type="text" class="form-control" value="{{platform.platform_region}}" disabled>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="">Leader name</label>
+        <input type="text" class="form-control" value="{{platform.leader_name}}" disabled>
+      </div>
+      <div class="col">
+        <label for="">Phone</label>
+        <input type="text" class="form-control" value="{{platform.phone_number}}" disabled>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Add Platform Modal -->
+<div
+  class="modal fade"
+  id="addPlatformModal"
+  tabindex="-1"
+  aria-labelledby="addPlatformModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Cluster</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          id="platform-modal-close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-4">
+        <h5>Cluster Information</h5>
+        <form [formGroup]="createPlatformForm" (ngSubmit)="savePlatform()">
+          <div class="form-row mb-3">
+            <div class="col">
+              <input
+              type="text"
+              class="form-control"
+              placeholder="Cluster Name"
+              formControlName="platform_name"
+            />
+            </div>
+            <div class="col">
+              <select name="" class="form-control" formControlName="platform_region">
+                <option selected disabled value="">
+                  Select Region
+                </option>
+                <option value="{{ region.shortcode }}" *ngFor="let region of regions">
+                  {{ region.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row mb-3">
+            <div class="col-md-6">
+              <br>
+              <button type="button" (click)="clickImgInput()" id="img-btn" class="btn btn-info" *ngIf="!imageAdded">Add Cluster Image <i class="fas fa-download"></i></button>
+              <button type="button" class="btn btn-info" *ngIf="imageAdded">Cluster Image Added</button>
+              <input type="file" hidden id="img" class="form-control" (change)="onUploadChange($event)"/>
+            </div>
+            <div class="col-md-6">
+              <label for="">District</label>
+              <input type="text" class="form-control" formControlName="district">
+            </div>
+          </div>
+
+
+          <h5>Add Cluster Leader</h5>
+          <div class="form-row mb-3">
+            <div class="col">
+              <input type="text" class="form-control" placeholder="Full Name" formControlName="name" >
+            </div>
+            <div class="col">
+              <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">+255</div>
+                </div>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inlineFormInputGroup"
+                  placeholder="Phone Number"
+                  formControlName="phone_number"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group text-center">
+            <button class="btn btn-success" type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #deletePlatformModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Delete Platform</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <p>
+      Are you sure you want to delete {{ platform.platform_name }}
+    </p>
+    <button class="btn btn-danger" (click)="deletePlatformAction(platform.id)">
+      Delete
+    </button>
+  </div>
+</ng-template>

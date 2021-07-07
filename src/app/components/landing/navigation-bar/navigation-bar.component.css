@@ -1,0 +1,8 @@
+.status-btn{
+    cursor: pointer;
+}
+
+.status-btn:hover{
+    text-decoration: underline;
+    color: green;
+}

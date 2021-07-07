@@ -1,0 +1,65 @@
+<div class="mt-5">
+  <div class="container" style="min-height: 900px">
+    <div class="row" style="margin-top: 100px">
+      <div class="col-md-3 text-center">
+        <ng-container
+          *ngIf="user?.profile_image_path == null; else showImageBlk"
+        >
+          <img
+            src="assets/img/defaultImg.jpg"
+            class="rounded-circle"
+            alt="image"
+          />
+        </ng-container>
+        <ng-template #showImageBlk>
+          <img
+            src="https://rctapp.co.tz/rctimages/rct-upload-encoded/{{
+              user?.profile_image_path
+            }}"
+            class="rounded-circle"
+            alt="image"
+          />
+        </ng-template>
+        <br /><br />
+        <button
+          class="btn btn-success text-white"
+          *ngIf="en"
+          (click)="fileInput.click()"
+          type="button"
+        >
+          Update Profile Image
+        </button>
+        <button
+          class="btn btn-success text-white"
+          *ngIf="!en"
+          (click)="fileInput.click()"
+          type="button"
+        >
+          Badilisha picha
+        </button>
+        <input
+          style="display: none"
+          type="file"
+          accept=".png,.jpg"
+          (change)="onFileChanged($event)"
+          #fileInput
+        />
+      </div>
+      <div class="col-md-9">
+        <div class="mt-3">
+          <p>
+            {{ user?.user.name }}
+          </p>
+          <p>{{ user?.user.dial_code }} {{ user?.user.phone_number }}</p>
+          <p *ngIf="en">Role:</p>
+          <p *ngIf="!en">Jukumu:</p>
+          <ul>
+            <li *ngFor="let role of user?.roles">
+              {{ role.role }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

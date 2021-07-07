@@ -1,0 +1,267 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <a class="navbar-brand" routerLink="/">
+    RCT
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" routerLink="/" *ngIf="en">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" routerLink="/" *ngIf="!en">Nyumbani <span class="sr-only">(current)</span></a>
+      </li>
+
+      <ng-container *ngIf="showProfile">
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/home/profile" *ngIf="en">Profile</a>
+          <a class="nav-link text-white" routerLink="/home/profile" *ngIf="!en">Wasifu</a>
+        </li>
+        <li class="nav-item" *ngIf="role == 'seller'; else chatBuyer">
+          <a class="nav-link" routerLink="/home/sellers/chat" *ngIf="en">Chat</a>
+          <a class="nav-link" routerLink="/home/sellers/chat" *ngIf="en">Soga</a>
+        </li>
+
+        <ng-template #chatBuyer>
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/home/buyers/chat" *ngIf="en">Chat</a>
+            <a class="nav-link text-white" routerLink="/home/buyers/chat" *ngIf="!en">Soga</a>
+          </li>
+        </ng-template>
+
+      </ng-container>
+      <li class="nav-item">
+        <a class="nav-link" style="cursor: pointer;" (click)="openIndicativePricesModal(indicativePricesModal)"
+          *ngIf="en">Indicative Prices</a>
+        <a class="nav-link" style="cursor: pointer;" (click)="openIndicativePricesModal(indicativePricesModal)"
+          *ngIf="!en">Bei Elekezi</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="cursor: pointer;" (click)="openChangeLanguageModal(languageModal)"
+          *ngIf="en">Language</a>
+        <a class="nav-link" style="cursor: pointer;" (click)="openChangeLanguageModal(languageModal)"
+          *ngIf="!en">Lugha</a>
+      </li>
+    </ul>
+
+    <span *ngIf="en">
+      <a (click)="openAuthModal(authModal)" *ngIf="!isAuthed; else logOut" style="cursor: pointer; color: white;"
+        id="login">Login</a>
+    </span>
+    <span *ngIf="!en">
+      <a (click)="openAuthModal(authModal)" *ngIf="!isAuthed; else logOut" style="cursor: pointer; color: white;"
+        id="login">Ingia</a>
+    </span>
+    <ng-template #logOut>
+      <span *ngIf="en"><a style="cursor: pointer; color: white;" (click)="logout()">Logout</a></span>
+      <span *ngIf="!en"><a style="cursor: pointer; color: white;" (click)="logout()">Toka</a></span>
+    </ng-template>
+  </div>
+</nav>
+
+<!-- Authentication Modal -->
+<ng-template #authModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Sign In</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Ingia</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+
+    <div *ngIf="!isStaff">
+      <ng-container *ngIf="signIn">
+        <form [formGroup]="normalUserLoginForm" (ngSubmit)="authenticateNormalUser()">
+          <div class="form-group mb-3">
+            <ng-select [items]="countries" bindLabel="country_name" bindValue="dial_code" placeholder="Select Country"
+              [(ngModel)]="selectedCountryCode" formControlName="dial_code">
+            </ng-select>
+          </div>
+          <div class="form-group">
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  {{ selectedCountryCode }}
+                </div>
+              </div>
+              <input type="text" placeholder="Phone Number" class="form-control" formControlName="phone_number" />
+            </div>
+          </div>
+          <div class="form-group text-center">
+            <button class="btn btn-success" *ngIf="en">
+              Get SMS to Sign In
+            </button>
+            <button class="btn btn-success" *ngIf="!en">
+              Pata SMS Kuingia
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-container *ngIf="createAccount">
+        <form [formGroup]="registrationForm" (ngSubmit)="createAccountAction()">
+          <div class="form-group mb-3 text-center" *ngIf="!en">
+            Please enter your name below so that <br> you can be registered into the system.
+          </div>
+          <div class="form-group mb-3 text-center" *ngIf="!en">
+            Tafadhali ingiza jina lako kamili <br> ili uweze kuingia kwenye mfumo
+          </div>
+          <div class="form-group mb-3">
+            <input type="text" class="form-control" formControlName="fullName" placeholder="Enter Full Name">
+          </div>
+          <div class="form-group mb-3 text-center">
+            <button class="btn btn-success" type="submit" *ngIf="en">
+              Create Account
+            </button>
+            <button class="btn btn-success" type="submit" *ngIf="!en">
+              Tengeneza account
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-container *ngIf="isOTP">
+        <form [formGroup]="otpForm" (ngSubmit)="generateTokenWithOTP()">
+          <div class="form-group mb-3">
+            <input type="text" class="form-control" formControlName="otp" placeholder="Enter OTP">
+          </div>
+          <div class="form-group mb-2 text-center">
+            <button class="btn btn-success" type="submit" *ngIf="en">
+              Sign In
+            </button>
+            <button class="btn btn-success" type="submit" *ngIf="!en">
+              Ingia
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-container *ngIf="chooseRole">
+        <div class="text-center">
+          <div class="mb-3">
+            <p *ngIf="en">
+              Your account has more than one role, do you want to:
+            </p>
+            <p *ngIf="!en">
+              Akaunti yako ina jukumu zaidi ya moja, unataka:
+            </p>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-success" (click)="chosenRole(true)" *ngIf="en">Log in as Buyer</button>
+            <button class="btn btn-success" (click)="chosenRole(true)" *ngIf="!en">Ingia kama Mnunuaji</button>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-success" (click)="chosenRole(false)" *ngIf="en">Log in as Seller</button>
+            <button class="btn btn-success" (click)="chosenRole(false)" *ngIf="!en">Ingia kama Muuzaji</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="text-center">
+        <small *ngIf="en">Management staff? <a class="status-btn" (click)="changeStatus()">Click here</a></small>
+        <small *ngIf="!en">Wewe ni Msimamizi? <a class="status-btn" (click)="changeStatus()">Bofya hapa</a></small>
+      </div>
+    </div>
+
+
+    <!-- management form -->
+    <div *ngIf="isStaff">
+
+      <ng-container *ngIf="!chooseRoleAdmin">
+        <form [formGroup]="adminLoginForm" (ngSubmit)="goToAdmin()">
+          <div class="form-group">
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  +255
+                </div>
+              </div>
+              <input type="text" placeholder="Phone Number" class="form-control" formControlName="phone_number" />
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control" placeholder="Password" formControlName="password" />
+          </div>
+          <div class="form-group text-center">
+            <button class="btn btn-success" type="submit" *ngIf="en">Sign In</button>
+            <button class="btn btn-success" type="submit" *ngIf="!en">Ingia</button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-container *ngIf="chooseRoleAdmin">
+        <div class="text-center">
+          <div class="mb-3">
+            <p *ngIf="en">
+              Your account has more than one role, do you want to:
+            </p>
+            <p *ngIf="!en">
+              Akaunti yako ina jukumu zaidi ya moja, unataka:
+            </p>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-success" (click)="chosenRoleAdmin(true)" *ngIf="en">Log in as Leader</button>
+            <button class="btn btn-success" (click)="chosenRoleAdmin(true)" *ngIf="!en">Ingia kama Kiongozi</button>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-success" (click)="chosenRoleAdmin(false)" *ngIf="en">Log in as Admin</button>
+            <button class="btn btn-success" (click)="chosenRoleAdmin(false)" *ngIf="!en">Ingia kama Msimamizi</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="text-center">
+        <small *ngIf="en">
+          Are you a buyer or seller? <a class="status-btn" (click)="changeStatus()">Sign in here</a>
+        </small>
+        <small *ngIf="!en">
+          Wewe ni mnunuaji au muuzaji? <a class="status-btn" (click)="changeStatus()">Bofya hapa</a>
+        </small>
+      </div>
+    </div>
+
+  </div>
+</ng-template>
+
+<!-- View Indicative Prices -->
+<ng-template #indicativePricesModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Indicative Prices</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Bei Elekezi</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngFor="let price of priceRates">
+      <p class="text-muted">
+        <b>TZS {{ price.price_rate }}</b> for {{ price.variety }}
+      </p>
+    </div>
+  </div>
+
+</ng-template>
+
+<!-- Language change modal -->
+<ng-template #languageModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="en">Change Language</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!en">Badili Lugha</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body d-flex justify-content-center">
+      <div class="form-group">
+        <select name="" id="" class="form-control" (change)="changeLanguage($event.target.value)">
+          <option value="" disabled selected>Chagua</option>
+          <option value="en">English</option>
+          <option value="sw">Swahili</option>
+        </select>
+      </div>
+  </div>
+</ng-template>
