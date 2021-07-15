@@ -41,6 +41,7 @@
                 </ng-template>
                 <div class="flex-grow-1 ml-3">
                   {{ buyer.name }}
+                   <div class="text-muted small"><em>Quote: {{ buyer.qouteID.substring(0,8) }}</em></div>
                 </div>
               </div>
             </a>
@@ -140,6 +141,7 @@
                 <!-- message input -->
                 <input
                   type="text"
+                  id="inputbox"
                   class="form-control"
                   [(ngModel)]="messageSent"
                   placeholder="Type your message"

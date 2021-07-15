@@ -5,6 +5,7 @@ import { HelperService } from 'src/app/services/helper.service';
 import * as moment from 'moment';
 declare var $: any;
 import * as firebase from 'firebase';
+import { DatabaseReference } from '@angular/fire/database/interfaces';
 
 @Component({
   selector: 'app-buyer-firebase-chat',
@@ -15,18 +16,19 @@ export class BuyerFirebaseChatComponent implements OnInit, OnDestroy {
   sellers = [];
   en: boolean = false;
   languageSubsription: Subscription;
-  userId: string;
-  qouteId: string;
-  sellerId: string;
+  userId: string = null;
+  qouteId: string = null;
+  sellerId: string = null;
   messages = [];
   messageSent = '';
   sellerName: string;
   sellerImage: any = '';
   displayChats: boolean = false;
+  firebaseChatRef: DatabaseReference;
 
   constructor(
     private afDB: AngularFireDatabase,
-    private helperService: HelperService
+    private helperService: HelperService,
   ) {
     this.languageSubsription = this.helperService
       .getLanguage()
@@ -92,26 +94,31 @@ export class BuyerFirebaseChatComponent implements OnInit, OnDestroy {
 
     this.sellerImage = seller.seller_image;
 
-    if (this.sellerId !== seller.sellerID) {
-      //when its a new seller clicked, unsubscribe from current convo if tracked.
+    if (this.qouteId != seller.qouteID) {
+      console.log('quote id is different');
+      this.messages = [];
+
       if (this.qouteId != null) {
-        firebase.default
-          .database()
-          .ref(`chats/${this.userId}/${this.qouteId}`)
-          .off();
+        this.firebaseChatRef.off();
+        console.log('listener closed');
       }
 
-      //set new qouteID
+      //set new quoteID
       this.qouteId = seller.qouteID;
 
-      //subscribe to new conversation
-      firebase.default
+      this.firebaseChatRef = firebase.default
         .database()
-        .ref(`chats/${this.userId}/${this.qouteId}/`)
-        .on('child_added', (data) => {
-          console.log(data.val());
+        .ref(`chats/${this.userId}/${this.qouteId}/`);
 
-          this.messages.push(data.val());
+      this.afDB
+        .list(`chats/${this.userId}/${this.qouteId}`)
+        .stateChanges(['child_added'])
+        .subscribe((data) => {
+          console.log(data.payload.val());
+          this.messages.push(data.payload.val());
+          if (data.payload.val()) {
+            this.scrollAction();
+          }
         });
     }
 
@@ -120,8 +127,6 @@ export class BuyerFirebaseChatComponent implements OnInit, OnDestroy {
     }
 
     this.sellerName = seller.name;
-
-    console.log(this.sellerName);
 
     this.sellerId = seller.sellerID;
 
@@ -144,37 +149,29 @@ export class BuyerFirebaseChatComponent implements OnInit, OnDestroy {
 
     //message object to add to messages array so as to display
     let messageObjForSender = {
+      message: messageToSend,
       quote_id: this.qouteId,
       sender_id: this.userId,
-      message: messageToSend,
       receiver_id: this.sellerId,
       time: moment().valueOf(),
       readStatus: true,
     };
 
     let messageObjForReciever = {
+      message: messageToSend,
       quote_id: this.qouteId,
       sender_id: this.userId,
-      message: messageToSend,
       receiver_id: this.sellerId,
       time: moment().valueOf(),
-      readStatus: true,
+      readStatus: false,
     };
 
-    //add message to array for good UX
-    // this.messages.push(messageObj);
-    // this.afDB.list(`chats/${this.userId}/${this.qouteId}`).push(messageObjForSender).then(() => {
-    //   this.afDB.list(`chats/${this.sellerId}/${this.qouteId}`).push(messageObjForReciever)
-    // });
-
-    firebase.default
-      .database()
-      .ref(`chats/${this.userId}/${this.qouteId}`)
+    this.afDB
+      .list(`chats/${this.userId}/${this.qouteId}`)
       .push(messageObjForSender)
       .then(() => {
-        firebase.default
-          .database()
-          .ref(`chats/${this.sellerId}/${this.qouteId}`)
+        this.afDB
+          .list(`chats/${this.sellerId}/${this.qouteId}`)
           .push(messageObjForReciever);
       });
 
@@ -186,10 +183,10 @@ export class BuyerFirebaseChatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.languageSubsription.unsubscribe();
-    firebase.default
-      .database()
-      .ref(`chats/${this.userId}/${this.qouteId}`)
-      .off();
+    this.afDB
+    .list(`chats/${this.userId}/${this.qouteId}`)
+    .stateChanges(['child_added'])
+    .subscribe().unsubscribe()
     this.afDB
       .list(`messenger/${this.userId}`)
       .valueChanges()

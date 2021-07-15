@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DataTableDirective } from 'angular-datatables';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { BuyerService } from 'src/app/services/buyer.service';
 import { HelperService } from 'src/app/services/helper.service';
@@ -30,6 +31,10 @@ export class BuyersListComponent implements OnInit, OnDestroy {
   isImageLoaded: boolean = false
   en: boolean = false
   languageSubsription: Subscription
+  dtOptions: DataTables.Settings = {};
+  dtTrigger: Subject<any> = new Subject<any>();
+  dtElement: DataTableDirective;
+  isDtInitialized:boolean = false
 
   constructor(
     private buyerService: BuyerService,
@@ -52,9 +57,15 @@ export class BuyersListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy():void{
     this.languageSubsription.unsubscribe()
+    this.dtTrigger.unsubscribe();
   }
 
   ngOnInit(): void {
+
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 10
+    };
     
     if(localStorage.getItem('lang') === 'en'){
       this.en = true
@@ -67,7 +78,17 @@ export class BuyersListComponent implements OnInit, OnDestroy {
         ...x,
         selected: false,
         buyer_id: x.id,
-      }));
+      })).filter(x => x.name != null)
+
+      if (this.isDtInitialized) {
+        this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+          dtInstance.destroy();
+          this.dtTrigger.next();
+        });
+      } else {
+        this.isDtInitialized = true
+        this.dtTrigger.next();
+      }
     });
   }
 

@@ -3,7 +3,7 @@
     <div class="row" style="margin-top: 100px">
       <div class="col-md-3 text-center">
         <ng-container
-          *ngIf="user?.profile_image_path == null; else showImageBlk"
+          *ngIf="user?.profile_image_path == ''; else showImageBlk"
         >
           <img
             src="assets/img/defaultImg.jpg"

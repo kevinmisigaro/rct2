@@ -43,6 +43,7 @@
                 </ng-template>
                 <div class="flex-grow-1 ml-3">
                   {{ seller.name }}
+                  <div class="text-muted small"><em>Quote: {{ seller.qouteID.substring(0,8) }}</em></div>
                 </div>
               </div>
             </a>
@@ -90,7 +91,7 @@
                   <ng-container *ngFor="let message of messages">
                     <div
                       class="chat-message-right pb-4"
-                      *ngIf="message.sender_id == userId; else recievedTxt"
+                      *ngIf="message.sender_id === userId; else recievedTxt"
                     >
                       <div class="sender rounded py-2 px-3">
                         <div class="font-weight-bold mb-1">You</div>
@@ -118,6 +119,8 @@
                         </div>
                       </div>
                     </ng-template>
+
+                    
                   </ng-container>
                 </ng-container>
               </div>
@@ -141,6 +144,7 @@
               <div class="input-group">
                 <input
                   type="text"
+                  id="chatinput"
                   class="form-control"
                   [(ngModel)]="messageSent"
                   placeholder="Type your message"

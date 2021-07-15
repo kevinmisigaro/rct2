@@ -837,8 +837,16 @@
         <button
           class="btn btn-success"
           [disabled]="!sellerToBuyerRequestForm.valid"
+          *ngIf="en"
         >
           Send Request
+        </button>
+        <button
+          class="btn btn-success"
+          
+          *ngIf="!en"
+        >
+          Tuma Ombi
         </button>
       </div>
     </form>

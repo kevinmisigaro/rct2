@@ -28,7 +28,7 @@
         </button>
       </div>
       <div class="card-body">
-        <table class="table table-bordered">
+        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
           <thead *ngIf="en">
             <tr>
               <th scope="col">
@@ -40,9 +40,6 @@
                   />
                   <label class="form-check-label"></label>
                 </div>
-              </th>
-              <th>
-                ID  
               </th>
               <th>Name</th>
               <th>Country</th>
@@ -61,9 +58,6 @@
                   <label class="form-check-label"></label>
                 </div>
               </th>
-              <th>
-                ID  
-              </th>
               <th>Jina kamili</th>
               <th>Nchi</th>
               <th></th>
@@ -81,9 +75,6 @@
                   />
                   <label class="form-check-label"></label>
                 </div>
-              </td>
-              <td>
-                {{ buyer.id }}
               </td>
               <td>
                 {{ buyer.name }}

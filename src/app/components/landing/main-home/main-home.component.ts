@@ -148,9 +148,8 @@ export class MainHomeComponent implements OnInit, OnDestroy {
 
         //display qoutations to start chat
         this.buyerService.getQouteFromBuyers().subscribe((res) => {
-          // this.qoutes = res.data.filter((x) => x.active == 1);
-          this.qoutes = res.data;
-          console.log(this.qoutes);
+          this.qoutes = res.data.filter((x) => x.active === 1);
+          console.log('THE QUOTES ARE ',this.qoutes);
         });
       }
     });
@@ -363,48 +362,45 @@ export class MainHomeComponent implements OnInit, OnDestroy {
       };
 
       this.tenderService.approveQoute(this.singleQoute.id).subscribe(() => {
-        this.chat.createChatFromQoute(data).subscribe(() => {
-          // this.spinner.hide();
-          // this.router.navigate(['/home/buyers/chat']);
+        
 
-          let sellerInfo = this.allSellers.find(
-            (x) => x.id === this.singleQoute.seller_id
-          );
-          let buyerInfo = this.allBuyers.find((x) => x.id === userID);
-  
-          //create messenger
-          this.afDb.database.ref().child(`messenger/${userID}/${this.singleQoute.id}/`).set({
+        let sellerInfo = this.allSellers.find(
+          (x) => x.id === this.singleQoute.seller_id
+        );
+        let buyerInfo = this.allBuyers.find((x) => x.id === userID);
+
+        //create messenger
+        this.afDb.database.ref().child(`messenger/${userID}/${this.singleQoute.id}/`).set({
+          seller_id: sellerInfo.id,
+          seller: sellerInfo.full_name,
+          seller_image_path: sellerInfo.image_path,
+          expiration_status: false,
+          buyer_id: buyerInfo.id,
+          buyer: buyerInfo.name,
+          buyer_image_path: buyerInfo.image,
+          chat_status: true,
+          update_time: moment().valueOf(),
+          quote_id: this.singleQoute.id
+        }).then(() => {
+          this.afDb.database.ref().child(`messenger/${sellerInfo.id}/${this.singleQoute.id}/`).set({
             seller_id: sellerInfo.id,
             seller: sellerInfo.full_name,
             seller_image_path: sellerInfo.image_path,
             expiration_status: false,
-            messenger_id: userID,
             buyer_id: buyerInfo.id,
             buyer: buyerInfo.name,
             buyer_image_path: buyerInfo.image,
             chat_status: true,
             update_time: moment().valueOf(),
             quote_id: this.singleQoute.id
-          }).then(() => {
-            this.afDb.database.ref().child(`messenger/${sellerInfo.id}/${this.singleQoute.id}/`).set({
-              seller_id: sellerInfo.id,
-              seller: sellerInfo.full_name,
-              seller_image_path: sellerInfo.image_path,
-              expiration_status: false,
-              messenger_id: userID,
-              buyer_id: buyerInfo.id,
-              buyer: buyerInfo.name,
-              buyer_image_path: buyerInfo.image,
-              chat_status: true,
-              update_time: moment().valueOf(),
-              quote_id: this.singleQoute.id
-            })
-          });
-  
-          this.spinner.hide();
-  
-          this.router.navigate(['/home/buyers/chat']);
+          })
         });
+
+        this.spinner.hide();
+
+        this.router.navigate(['/home/buyers/chat']);
+
+
       });
     });
   }

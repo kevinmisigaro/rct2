@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { HelperService } from 'src/app/services/helper.service';
 import * as moment from 'moment';
 import * as firebase from 'firebase';
+import { DatabaseReference } from '@angular/fire/database/interfaces';
 
 @Component({
   selector: 'app-seller-firebase-chat',
@@ -16,17 +17,18 @@ export class SellerFirebaseChatComponent implements OnInit, OnDestroy {
   qouteId: string;
   buyerId: string;
   buyers = [];
-  messages = [];
+  messages = []
   messageSent = '';
   buyerChosen: boolean = false;
   buyerName: string;
   buyerImage: any = '';
   en: boolean = false;
   languageSubsription: Subscription;
+  firebaseChatRef: DatabaseReference;
 
   constructor(
     private helper: HelperService,
-    private afDB: AngularFireDatabase
+    private afDB: AngularFireDatabase,
   ) {
     this.languageSubsription = this.helper
       .getLanguage()
@@ -52,21 +54,19 @@ export class SellerFirebaseChatComponent implements OnInit, OnDestroy {
           var dateToTest = moment(x.update_time);
           var currDate = moment();
           if (currDate.isSameOrAfter(dateToTest.add(1, 'week'))) {
-            this.afDB
-              .list(`messenger/${this.userId}`)
-              .update(`${x.quote_id}`, {
-                ...x,
-                chat_status: false,
-                expiration_status: true,
-              });
+            this.afDB.list(`messenger/${this.userId}`).update(`${x.quote_id}`, {
+              ...x,
+              chat_status: false,
+              expiration_status: true,
+            });
           }
         });
 
-        let messengers: [] = items.filter((x) =>  x.chat_status === true);
+        let messengers: [] = items.filter((x) => x.chat_status === true);
 
         this.buyers = messengers.map((x: any) => ({
           qouteID: x.quote_id,
-          buyerID: x.messenger_id,
+          buyerID: x.buyer_id,
           name: x.buyer,
           buyer_image: x.buyer_image_path,
           unreadMessages: 0,
@@ -94,26 +94,36 @@ export class SellerFirebaseChatComponent implements OnInit, OnDestroy {
   }
 
   userClicked(buyer) {
-    this.buyerChosen = true;
+    console.log('the seller is ', buyer);
     this.displayChats = true;
 
     this.buyerImage = buyer.buyer_image;
 
-    if (this.buyerId !== buyer.buyerID) {
-      //when its a new buyer clicked, unsubscribe from current convo if tracked.
+    if (this.qouteId != buyer.qouteID) {
+      console.log('quote id is different');
+      this.messages = [];
+
       if (this.qouteId != null) {
-        firebase.default.database().ref(`chats/${this.userId}/${this.qouteId}`).off();
+        this.firebaseChatRef.off();
+        console.log('listener closed');
       }
 
-      //set new qouteID
+      //set new quoteID
       this.qouteId = buyer.qouteID;
 
-      //subscribe to new conversation
-      firebase.default
+      this.firebaseChatRef = firebase.default
         .database()
-        .ref(`chats/${this.userId}/${this.qouteId}`)
-        .on('child_added', (data) => {
-          this.messages.push(data.val());
+        .ref(`chats/${this.userId}/${this.qouteId}/`);
+
+      this.afDB
+        .list(`chats/${this.userId}/${this.qouteId}`)
+        .stateChanges(['child_added'])
+        .subscribe((data) => {
+          console.log(data.payload.val());
+          this.messages.push(data.payload.val());
+          if (data.payload.val()) {
+            this.scrollAction();
+          }
         });
     }
 
@@ -139,19 +149,33 @@ export class SellerFirebaseChatComponent implements OnInit, OnDestroy {
     let messageToSend = this.messageSent;
 
     //message object to add to messages array so as to display
-    let messageObj = {
+    let messageObjForSender = {
+      message: messageToSend,
       quote_id: this.qouteId,
       sender_id: this.userId,
-      message: messageToSend,
       receiver_id: this.buyerId,
-      time: moment().valueOf()
+      time: moment().valueOf(),
+      readStatus: true,
     };
 
-    //add message to array for good UX
-    // this.messages.push(messageObj);
-    this.afDB.list(`chats/${this.userId}/${this.qouteId}`).push(messageObj).then(() => {
-      this.afDB.list(`chats/${this.buyerId}/${this.qouteId}`).push(messageObj)
-    });
+    let messageObjForReciever = {
+      message: messageToSend,
+      quote_id: this.qouteId,
+      sender_id: this.userId,
+      receiver_id: this.buyerId,
+      time: moment().valueOf(),
+      readStatus: false,
+    };
+
+    this.afDB
+      .list(`chats/${this.userId}/${this.qouteId}`)
+      .push(messageObjForSender)
+      .then(() => {
+        this.afDB
+          .list(`chats/${this.buyerId}/${this.qouteId}`)
+          .push(messageObjForReciever);
+      });
+
     //clear message object
     this.messageSent = '';
 
@@ -160,7 +184,14 @@ export class SellerFirebaseChatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.languageSubsription.unsubscribe();
-    firebase.default.database().ref(`chats/${this.userId}/${this.qouteId}`).off();
-    this.afDB.list(`messenger/${this.userId}`).valueChanges().subscribe().unsubscribe();
+    this.afDB
+    .list(`chats/${this.userId}/${this.qouteId}`)
+    .stateChanges(['child_added'])
+    .subscribe().unsubscribe()
+    this.afDB
+      .list(`messenger/${this.userId}`)
+      .valueChanges()
+      .subscribe()
+      .unsubscribe();
   }
 }

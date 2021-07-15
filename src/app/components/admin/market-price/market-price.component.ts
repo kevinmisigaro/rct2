@@ -58,7 +58,7 @@ export class MarketPriceComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.regions = this.helperService.getRegions();
+    this.regions = this.helperService.getRegions().sort((a,b) => a.name.localeCompare(b.name))
 
     if(localStorage.getItem('role') == 'leader'){
       this.auth.userInformation().subscribe((res) => {
@@ -70,14 +70,14 @@ export class MarketPriceComponent implements OnInit, OnDestroy {
           ).platform_name;
   
           this.varietyService.getAllVarieties().subscribe((res) => {
-            this.varieties = res.data;
-            console.log(this.varieties)
+            this.varieties = res.data.sort((a, b) => a.variety_name.localeCompare(b.variety_name))
+
           });
         });
       });
     } else {
       this.varietyService.getAllVarieties().subscribe(res => {
-        this.varieties = res.data
+        this.varieties = res.data.sort((a, b) => a.variety_name.localeCompare(b.variety_name))
       })
     }
 

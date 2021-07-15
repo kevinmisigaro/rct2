@@ -17,11 +17,11 @@
       <ng-container *ngIf="showProfile">
         <li class="nav-item">
           <a class="nav-link text-white" routerLink="/home/profile" *ngIf="en">Profile</a>
-          <a class="nav-link text-white" routerLink="/home/profile" *ngIf="!en">Wasifu</a>
+          <a class="nav-link text-white" routerLink="/home/profile" *ngIf="!en">Akaunti</a>
         </li>
         <li class="nav-item" *ngIf="role == 'seller'; else chatBuyer">
           <a class="nav-link" routerLink="/home/sellers/chat" *ngIf="en">Chat</a>
-          <a class="nav-link" routerLink="/home/sellers/chat" *ngIf="en">Soga</a>
+          <a class="nav-link" routerLink="/home/sellers/chat" *ngIf="!en">Soga</a>
         </li>
 
         <ng-template #chatBuyer>
